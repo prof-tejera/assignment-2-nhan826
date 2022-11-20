@@ -1,10 +1,18 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useContext} from "react";
 import DisplayTime from "../generic/DisplayTime";
 import Button from "../generic/Button";
+import { TimerContext } from "../../context";
 
-const Countdown = ({startTime = 90}) => {
+const Countdown = ({startTime = 90, index}) => {
+    const context = useContext(TimerContext);
     const [timeElapsed, setTimeElapsed] = useState(startTime);
     const [pause, setPause] = useState(true);
+
+    useEffect(() => {
+      if (context.timerRunningState && index === 0){
+        setPause(!pause);
+      } 
+    }, [context]);
 
     useEffect(() => {
       // decrements timeElapsed by one if greater than 0 and not paused
@@ -13,25 +21,32 @@ const Countdown = ({startTime = 90}) => {
             setTimeElapsed(timeElapsed - 1);
             }, 1000);
             return () => clearInterval(interval); // cleans up the interval when unmounts
+        } else if (timeElapsed <= 0){
+          context.deleteFromQueue(index);
+          context.setTimerRunningState(true);
         }
       }, [timeElapsed, pause]);
     
       const reset = () => {
         setTimeElapsed(startTime);
         setPause(true);
+        context.setTimerQueue(context.initialQueue)
       }
 
       const fastForward = () => {
-        setTimeElapsed(0);
+        context.deleteFromQueue(index);
+        context.setTimerRunningState(true);
+        if (context.timerQueue.length <= 1){
+          context.setInitialQueue([]);
+        } 
       }
 
     return (
         <div>
-            <DisplayTime time={timeElapsed} />
-            <Button theme = {pause ? "green" : "white"} activeState = {timeElapsed === 0} onClick={ () => setPause(!pause)} label={pause ? "Play" : "Pause"}></Button>
-            <Button theme = {"blue"} activeState = {timeElapsed === startTime} onClick={reset} label={"Reset"}></Button>
-            <Button theme = {"darkblue"} activeState = {timeElapsed === 0}  onClick={fastForward} label={"Fast Forward"}></Button>
-
+            <DisplayTime timeInSeconds={timeElapsed} />
+            <Button type = {pause ? "green" : "white"} disabled = {timeElapsed === 0} onClick={ () => setPause(!pause)} label={pause ? "Play" : "Pause"}></Button>
+            <Button type = "blue" disabled = {timeElapsed === startTime} onClick={reset} label="Reset"></Button>
+            <Button type = "darkblue" disabled = {timeElapsed === 0}  onClick={fastForward} label="Fast Forward"></Button>
         </div>
     );
 

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 // reference for for theme toggle: https://www.youtube.com/watch?v=gP8nQVlrwc0&t=552s&ab_channel=react.school
-const theme = {
+const type = {
   green: {
     default: "#2B7967",
     hover: "#378a77",
@@ -22,17 +22,16 @@ const theme = {
     color: "#ffffff",
     hover: "#0f2f87",
   }
-
 }
 
 const TimerButton = styled.button`
   cursor: pointer;
-  color: ${props => theme[props.theme].color};
+  color: ${props => type[props.type].color};
   width: 200px;
   padding: 10px;
   padding-left: 20px;
   padding-right: 20px;
-  background-color: ${props => theme[props.theme].default};
+  background-color: ${props => type[props.type].default};
   border:none;
   border-radius: 10px;
   margin: 10px;
@@ -40,8 +39,8 @@ const TimerButton = styled.button`
   font-size: 90%;
   transition: all 0.3s ease;
   &:hover {
-    background-color: ${props => theme[props.theme].hover};
-    color: ${props => theme[props.theme].color};
+    background-color: ${props => type[props.type].hover};
+    color: ${props => type[props.type].color};
   }
   &:disabled {
     opacity: 20%;
@@ -50,13 +49,13 @@ const TimerButton = styled.button`
 `;
 
 TimerButton.defaultProps = {
-  theme: 'green'
+  type: 'green'
 }
 
 
-const Button= ({onClick, label, activeState, theme}) => {
+const Button= ({onClick, label, disabled, type}) => {
   return (
-  <TimerButton theme = {theme} disabled = {activeState} onClick = {onClick}>
+  <TimerButton type = {type} disabled = {disabled} onClick = {onClick}>
       {label}
   </TimerButton>
   );

@@ -1,50 +1,67 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useContext} from "react";
 import DisplayTime from "../generic/DisplayTime";
 import Button from "../generic/Button";
 import DisplayRound from "../generic/DisplayRound";
+import { TimerContext } from "../../context";
+
 
  
-const XY = ({timeLimit = 10, totalRounds=2}) => {
+const XY = ({timeLimit = 3, totalRounds=4, index}) => {
+    const context = useContext(TimerContext);
+    const [timeElapsed, setTimeElapsed] = useState(0);
+    const [pause, setPause] = useState(true);
+    const [round, setRound] = useState(1);
 
-        const [timeElapsed, setTimeElapsed] = useState(0);
-        const [pause, setPause] = useState(true);
-        const [round, setRound] = useState(1);
-    
-        useEffect(() => {
-            if (timeElapsed <= timeLimit && !pause && round <= totalRounds){
-                const interval = setInterval(() => {
-                setTimeElapsed(timeElapsed + 1);
-                }, 1000);
-                return () => clearInterval(interval); // cleans up the interval when unmounts
-            }else if( timeElapsed > timeLimit){
-                // resets timeElapsed and increments round
-                setTimeElapsed(0);
-                setRound(round + 1);
-            }else if (round > totalRounds && timeElapsed < timeLimit){
-                fastForward();  // pauses in end state when complete
-            }
-        }, [timeElapsed, pause]);
-    
-        const reset = () => {
+    useEffect(() => {
+        if (context.timerRunningState && index === 0){
+          setPause(!pause);
+        } 
+      }, [context]);
+
+    useEffect(() => {
+        if (timeElapsed < timeLimit && !pause && round <= totalRounds){
+            const interval = setInterval(() => {
+            setTimeElapsed(timeElapsed + 1);
+            }, 1000);
+            return () => clearInterval(interval); // cleans up the interval when unmounts
+        }else if(timeElapsed >= timeLimit){
+            // resets timeElapsed and increments round
             setTimeElapsed(0);
-            setRound(1);
-            setPause(true);
+            if (round < totalRounds){
+                setRound(round + 1);
+            }else{
+                setTimeElapsed(timeLimit);
+                setPause(true);
+                context.deleteFromQueue(index);
+                context.setTimerRunningState(true);
+            }
         }
+    }, [timeElapsed, pause]);
+
+    const reset = () => {
+        setTimeElapsed(0);
+        setRound(1);
+        setPause(true);
+        context.setTimerQueue(context.initialQueue);
+    }
+
+    const fastForward = () => {
+        setTimeElapsed(timeLimit);
+        context.deleteFromQueue(index);
+        context.setTimerRunningState(true);
+        setRound(totalRounds);
+        setPause(true);
+    }
+
+    return (
+        <div>
+            <DisplayRound rounds = {`${round} of ${totalRounds}` } ></DisplayRound>
+            <DisplayTime timeInSeconds={timeLimit - timeElapsed} />
+            <Button type = {pause ? "green" : "white"} disabled = {totalRounds === round && timeElapsed === timeLimit} onClick={ () => setPause(!pause)} label={pause ? "Play" : "Pause"}></Button>
+            <Button type = "blue" disabled = {round === 0 && !timeElapsed} onClick={reset} label="Reset"></Button>
+            <Button type = "darkblue" disabled = {totalRounds === round && timeElapsed === timeLimit}  onClick={fastForward} label="Fast Forward"></Button>
+        </div>
+    );
+};
     
-        const fastForward = () => {
-            setTimeElapsed(timeLimit);
-            setRound(totalRounds);
-            setPause(true);
-        }
-    
-        return (
-            <div>
-                <DisplayRound rounds = {round} ></DisplayRound>
-                <DisplayTime time={timeLimit - timeElapsed} />
-                <Button theme = {pause ? "green" : "white"} activeState = {totalRounds === round && timeElapsed === timeLimit} onClick={ () => setPause(!pause)} label={pause ? "Play" : "Pause"}></Button>
-                <Button theme = {"blue"} activeState = {round === 0 && !timeElapsed} onClick={reset} label={"Reset"}></Button>
-                <Button theme = {"darkblue"} activeState = {totalRounds === round && timeElapsed === timeLimit}  onClick={fastForward} label={"Fast Forward"}></Button>
-            </div>
-        );
-    };
 export default XY;

@@ -2,11 +2,14 @@ import React from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
-  border: 1px solid #121212;
   margin: 20px 0px;
+  padding: 20px;
 `;
 
 const Container = styled.div`
+  border: 2px ridge #194E41;
+  border-radius: 10px;
+  background-color: #e3e4e6;
   padding: 20px;
   display: flex;
   justify-content: space-between;
@@ -14,15 +17,23 @@ const Container = styled.div`
 
 const Title = styled.div`
   display: flex;
+  margin-bottom: 10px;
   justify-content: center;
   padding-top: 20px;
   font-size: 1.3rem;
+  flex-grow: 1;
 `;
 
 const RenderComponent = styled.div`
   padding: 25px;
   display: flex;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
   align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-grow: 1;
 `;
 
 const Documentation = styled.table``;

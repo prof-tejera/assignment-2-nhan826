@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 
-const theme = {
+const type = {
   green: {
     color: "#c6e1d5",
   },
@@ -24,7 +24,7 @@ const RoundScreen = styled.p`
 `;
 
 const PeriodDisplay = styled.div`
-    background-color: ${props => theme[props.theme].color};;
+    background-color: ${props => type[props.type].color};;
     text-align: center;
     color: black;
     border-bottom-left-radius: 10px;
@@ -37,13 +37,12 @@ const PeriodDisplay = styled.div`
 
 
 PeriodDisplay.defaultProps = {
-  theme: 'green'
+  type: 'green'
 }
 
 
-const DisplayRound= ({rounds, period, theme}) => {
-  
-    return <RoundScreen>Round: {rounds} <br></br> <PeriodDisplay theme = {theme}>{period}</PeriodDisplay></RoundScreen>;
+const DisplayRound= ({rounds, period, type}) => {
+    return <RoundScreen>Round: {rounds} <br></br> <PeriodDisplay type = {type}>{period}</PeriodDisplay></RoundScreen>;
   };
 
 export default DisplayRound;
